@@ -3,10 +3,13 @@ require_relative "node.rb"
 class Tree
   attr_accessor :root
 
-  @root = nil
 
+  def initialize(array)
+    build_tree(array)
+  end
 
   def build_tree(array, st=0, en=array.length - 1)
+    @root = nil
     array = array.sort.uniq
 
     return nil if st > en
@@ -28,15 +31,56 @@ class Tree
     pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.left
   end
 
-  def insert()
+  def insert(n)
+    traverse { |node|
+      if n == node.data
+        puts "Value present"
+        return
+      elsif n < node.data && !node.left
+        node.left = Node.new(n)
+      elsif n > node.data && !node.right
+        node.right = Node.new(n)
+      end
+    }
+  end
+
+  def delete(n)
+    change_made? = false
+    traverse { |node|
+      if node.right == n
+        change_made? = true
+        if node.right.children_nil?
+          node.right = nil
+          return
+        else
+          hash = node.right.child_hash
+          node.right = hash[:right] if hash[:right]
+          node.left = hash[:left] if hash[:left]
+        end
+      elsif node.left == n
+        change_made? = true
+        if node.left.children_nil?
+          node.left = nil
+          return
+        else
+          hash = node.left.child_hash
+          node.left = hash[:left] if hash[:left]
+          node.left = hash[:left] if hash[:left]
+        end
+      end
+      puts "Value not present" if !change_made?
+    }
+  end
+
+
+  def rebalance()
+    build_tree(to_a)
   end
 
   def find(n)
     traverse { |node|
       if n == node.data
-        puts "value present"
         yield node if block_given?
-        return node
       else
       end
       puts "value not present"
@@ -50,8 +94,8 @@ class Tree
     traverse(root.left) if root.left
   end
 
-  def to_a(n)
-    array = [n]
+  def to_a(n = nil)
+    array = [] if !n
     traverse { |node|
       array.push(node.data)
     }

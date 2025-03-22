@@ -21,5 +21,14 @@ class Node
   end
 
   def children_nil?
+    return true if !@left && !@right
   end
+
+  def child_hash()
+    hash = {}
+    hash[:left] = left if left
+    has[:right] = right if right
+    return hash
+  end
+
 end
