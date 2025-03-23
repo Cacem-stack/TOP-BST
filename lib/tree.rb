@@ -90,8 +90,50 @@ class Tree
 
   def traverse(root = @root)
     yield root
-    traverse(root.right) if root.right
     traverse(root.left) if root.left
+    traverse(root.right) if root.right
+  end
+
+  def level_order_iteration()
+    root = @root
+    node_arr = []
+    node_arr += root.child_hash.values
+    yield root
+
+    root = node_arr.shift
+
+    until node_arr.length == 0
+      yield root
+      node_arr += root.child_hash.values
+    end
+
+  end
+
+  def lor_helper(root=@root, level=1, lev_arr=[])
+    lev_arr[0] = root if lev_arr.length == 0
+    lev_arr[lev] += root.child_hash.values
+
+    lor_helper(root.left, level+1, lev_arr)
+    lor_helper(root.right, level+1, lev_arr)
+
+    return lev_arr
+  end
+
+  def level_order_recursive()
+    lev_arr = level_order_recursive
+
+    for ele_arr in lev_arr
+      for ele in ele_arr
+        yield ele
+      end
+    end
+  def
+
+  def level_order_mixed(root = @root, node_arr = [])
+    node_arr += root.child_hash.values if
+    yield root
+    root = node_arr.shift
+    level_order_mixed(root, node_arr)
   end
 
   def to_a(n = nil)
@@ -101,7 +143,6 @@ class Tree
     }
     return array
   end
-
 
 end
 
