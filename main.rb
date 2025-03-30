@@ -28,5 +28,3 @@ tree.order("pre")
 tree.order("in")
 tree.order("post")
 tree.level_order_print
-
-tree.pretty_print
