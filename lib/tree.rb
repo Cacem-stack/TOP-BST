@@ -55,7 +55,7 @@ attr_accessor :root
         else
           hash = node.left.child_hash
           node.left = hash[:left] if hash[:left]
-          node.left = hash[:left] if hash[:left]
+          node.right = hash[:right] if hash[:right]
         end
       end
       puts "Value not present" if !change_made
