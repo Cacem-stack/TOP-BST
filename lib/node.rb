@@ -27,7 +27,7 @@ class Node
   def child_hash()
     hash = {}
     hash[:left] = left if left
-    has[:right] = right if right
+    hash[:right] = right if right
     return hash
   end
 

@@ -6,12 +6,11 @@ attr_accessor :root
 
   def initialize(array)
     @root = nil
-    array = array.sort.uniq
     build_tree(array)
   end
 
   def build_tree(array, st=0, en=array.length - 1)
-
+    array = array.sort.uniq
 
     return nil if st > en
     mid = (st + en) / 2
@@ -33,6 +32,18 @@ attr_accessor :root
     pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.left
   end
 
+  def insert(n)
+    traverse { |node|
+      if n == node.data
+        puts "Value present"
+        return
+      elsif n < node.data && !node.left
+        node.left = Node.new(n)
+      elsif n > node.data && !node.right
+        node.right = Node.new(n)
+      end
+    }
+  end
 
   def delete(n)
     change_made = false
@@ -63,7 +74,7 @@ attr_accessor :root
   end
 
   def rebalance()
-    build_tree(to_a(true))
+    build_tree(to_a)
   end
 
   def find(n)
@@ -77,44 +88,19 @@ attr_accessor :root
     }
   end
 
-  def to_a(reset = nil, n = nil)
+  def to_a(n = nil)
     array = [] if !n
     traverse { |node|
       array.push(node.data) if node
     }
-    @root = nil if reset
     return array
   end
 
-  def insert(n, node=@root)
-
-    return if node.data == nil
-
-    if !node.right && n > node.data
-      node.right = Node.new(n)
-      return true
-    elsif !node.left && n < node.data
-      node.left = Node.new(n)
-      return true
-    else
-    end
-
-    if n == node.data
-      puts "Value present"
-      return false
-    elsif n < node.data && node.left
-      insert(n, node.left)
-    elsif n > node.data && node.right
-      insert(n, node.right)
-    end
-
-  end
-
-  def traverse(root = @root, &block)
+  def traverse(root = @root)
     return if !root
     yield(root)
-    traverse(root.left, &block) if root.left
-    traverse(root.right, &block) if root.right
+    traverse(root.left) if root.left
+    traverse(root.right) if root.right
   end
 
   def height()
@@ -128,21 +114,15 @@ attr_accessor :root
   end
 
   def balanced?(root=@root, level=0)
+
     return if !root
     lev_left = balanced?(root.right, level+1) if root.right
     lev_right = balanced?(root.left, level+1) if root.left
-    if root != @root
-      if lev_left.to_f >= lev_right.to_f
-        level = lev_left if lev_left
-        return level
-      elsif lev_left.to_f < lev_right.to_f
-        level = lev_right if lev_right
-        return level
-      end
-
-    elsif root == @root
-      return true if (lev_left - lev_right).abs <= 1
-      return false if (lev_left - lev_right).abs > 1
+    return level if root != @root
+    if root == @root
+      return true if lev_left.abs - lev_right.abs <= 1
+    elsif lev_left.abs - lev_right.abs > 1
+      return false
     end
 
   end
@@ -161,21 +141,18 @@ attr_accessor :root
     end
   end
 
-  def level_order_recursive_helper(root=@root, level=0, lev_arr=[])
+  def level_order_recursive_helper(root=@root, level=1, lev_arr=[])
     return if !root
-    lev_arr[0] = [root.data] if lev_arr.length == 0
+    lev_arr[0] = root if lev_arr.length == 0
+    p root.child_hash.values
+    lev_arr[level] += root.child_hash.values
 
-    root.child_hash.values.each do |value|
-    lev_arr[0] = [root.data] if lev_arr.length == 0
-
-    lev_arr[level] = [value.data] if !lev_arr[level] && value.data
-    lev_arr[level] += [value.data] if lev_arr[level] && value.data
-    end
+    yield(root, level)
 
     level_order_recursive_helper(root.left, level+1, lev_arr)
     level_order_recursive_helper(root.right, level+1, lev_arr)
 
-    return lev_arr.flatten.uniq
+    return lev_arr
   end
 
   def level_order_recursive()
